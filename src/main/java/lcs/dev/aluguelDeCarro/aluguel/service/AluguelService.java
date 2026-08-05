@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+// Camada de serviço: concentra a regra de negócio de Aluguel entre o controller e o repositório
 @Service
 public class AluguelService {
 
@@ -19,6 +20,7 @@ public class AluguelService {
     private final AluguelMapper aluguelMapper;
 
 
+    // Injeção de dependência via construtor
     public AluguelService(AluguelRepository aluguelRepository, AluguelMapper aluguelMapper) {
         this.aluguelRepository = aluguelRepository;
         this.aluguelMapper = aluguelMapper;
@@ -26,6 +28,7 @@ public class AluguelService {
 
 
     // SALVAR ALUGUEL
+    // Converte o DTO em entidade, calcula o valor total pela quantidade de dias x diária do veículo e persiste
     public AluguelDTO salvarAluguel(AluguelDTO aluguelDTO) {
         AluguelModel aluguelModel = aluguelMapper.toModel(aluguelDTO);
         long dias = ChronoUnit.DAYS.between(aluguelModel.getDataInicio(), aluguelModel.getDataFim());
@@ -34,6 +37,7 @@ public class AluguelService {
         return aluguelMapper.toDTO(aluguelRepository.save(aluguelModel));
     }
     // LISTAR ALUGUEL
+    // Busca todos os registros e converte cada entidade em DTO
     public List<AluguelDTO> listarAluguel() {
         List<AluguelModel> aluguelModels = aluguelRepository.findAll();
         return aluguelModels.stream()
@@ -42,10 +46,12 @@ public class AluguelService {
     }
 
     // LISTAR ALUGUEL POR ID
+    // Retorna null (tratado no controller) se não encontrar
     public AluguelDTO consultarAluguelPorId(Long id) {
         return aluguelMapper.toDTO(aluguelRepository.findById(id).orElse(null));
     }
     // ATUALIZAR ALUGUEL POR ID
+    // Recalcula o valor total com base nas novas datas/veículo antes de salvar novamente
     public AluguelDTO atualizarAluguelPorId(Long id,  AluguelDTO aluguelDTO) {
         if (aluguelRepository.existsById(id)) {
             AluguelModel aluguelAtualizado = aluguelMapper.toModel(aluguelDTO);
@@ -55,7 +61,7 @@ public class AluguelService {
             aluguelAtualizado.setValorTotal(valorTotal);
             return aluguelMapper.toDTO(aluguelRepository.save(aluguelAtualizado));
         }
-        return null;
+        return null; // id não encontrado
     }
     // DELETAR ALUGUEL
     public void deleteAluguelPorId(Long id) {

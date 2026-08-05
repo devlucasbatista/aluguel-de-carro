@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Expõe os endpoints REST de Aluguel (prefixo /aluguel)
 @RestController
 @RequestMapping("/aluguel")
 public class AluguelController {
 
     private final AluguelService aluguelService;
 
+    // Injeção de dependência do service via construtor
     public AluguelController(AluguelService aluguelService) {
         this.aluguelService = aluguelService;
     }

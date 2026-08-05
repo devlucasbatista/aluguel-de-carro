@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
+// DTO: objeto usado para trafegar dados de Aluguel nas requisições/respostas da API (não é a entidade do banco)
+@NoArgsConstructor // gera construtor vazio (exigido para desserialização JSON)
+@AllArgsConstructor // gera construtor com todos os campos (usado pelo mapper)
+@Data // gera getters, setters, equals, hashCode e toString
 public class AluguelDTO {
 
     private Long id;
@@ -17,6 +18,6 @@ public class AluguelDTO {
     private LocalDate dataFim;
     private Double valorTotal;
     private AluguelStatus status;
-    private Long clienteId;
-    private Long veiculoId;
+    private Long clienteId; // id do cliente relacionado (evita expor a entidade inteira)
+    private Long veiculoId; // id do veículo relacionado (evita expor a entidade inteira)
 }
