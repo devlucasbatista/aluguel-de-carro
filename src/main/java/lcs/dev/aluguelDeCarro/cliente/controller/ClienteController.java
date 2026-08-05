@@ -85,7 +85,6 @@ public class ClienteController {
             @ApiResponse(responseCode = "404", description = "Cliente não encontrado, não foi possivel alterar")
     })
 
-
     public ResponseEntity<?> editarClientePorId(@PathVariable Long id, @RequestBody ClienteDTO cliente) {
         ClienteDTO atualizarCliente = clienteService.atualizarClientePorId(cliente, id);
         if (atualizarCliente != null) {
