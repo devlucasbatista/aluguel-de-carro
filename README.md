@@ -7,5 +7,8 @@ cadastram carros, clientes alugam.
 Java 17, Spring Boot, Spring Data JPA, H2, Swagger, Lombok
 
 ## Status
-✅ CRUD de Proprietário, Veículo e Cliente
-🚧 Aluguel em desenvolvimento
+
+- ✅ CRUD de Proprietário
+- ✅ CRUD de Veículo
+- ✅ CRUD de Cliente
+- ✅ CRUD de Aluguel (com cálculo automático de valorTotal)
