@@ -3,8 +3,8 @@ package lcs.dev.aluguelDeCarro.cliente.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lcs.dev.aluguelDeCarro.cliente.dto.ClienteDTO;
-import lcs.dev.aluguelDeCarro.cliente.model.ClienteModel;
 import lcs.dev.aluguelDeCarro.cliente.service.ClienteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +34,7 @@ public class ClienteController {
             @ApiResponse(responseCode = "400", description = "Cliente não foi salvo")
     })
 
-    public ResponseEntity<ClienteDTO> salvarCliente(@RequestBody ClienteDTO clienteDTO) {
+    public ResponseEntity<ClienteDTO> salvarCliente(@Valid @RequestBody ClienteDTO clienteDTO) {
         ClienteDTO cliente = clienteService.criarCliente(clienteDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(cliente);
@@ -85,7 +85,7 @@ public class ClienteController {
             @ApiResponse(responseCode = "404", description = "Cliente não encontrado, não foi possivel alterar")
     })
 
-    public ResponseEntity<?> editarClientePorId(@PathVariable Long id, @RequestBody ClienteDTO cliente) {
+    public ResponseEntity<?> editarClientePorId(@PathVariable Long id, @Valid @RequestBody ClienteDTO cliente) {
         ClienteDTO atualizarCliente = clienteService.atualizarClientePorId(cliente, id);
         if (atualizarCliente != null) {
             return ResponseEntity.ok(atualizarCliente);

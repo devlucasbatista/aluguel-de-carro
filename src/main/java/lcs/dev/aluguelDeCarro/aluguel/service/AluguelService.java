@@ -5,6 +5,7 @@ import lcs.dev.aluguelDeCarro.aluguel.mapper.AluguelMapper;
 import lcs.dev.aluguelDeCarro.aluguel.model.AluguelModel;
 import lcs.dev.aluguelDeCarro.aluguel.repository.AluguelRepository;
 import lcs.dev.aluguelDeCarro.exceptions.AluguelNotFoundException;
+import lcs.dev.aluguelDeCarro.exceptions.PeriodoInvalidoException;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
@@ -31,6 +32,11 @@ public class AluguelService {
     // Converte o DTO em entidade, calcula o valor total pela quantidade de dias x diária do veículo e persiste
     public AluguelDTO salvarAluguel(AluguelDTO aluguelDTO) {
         AluguelModel aluguelModel = aluguelMapper.toModel(aluguelDTO);
+
+        if (aluguelModel.getDataFim().isBefore(aluguelModel.getDataInicio())) {
+            throw new PeriodoInvalidoException();
+        }
+
         long dias = ChronoUnit.DAYS.between(aluguelModel.getDataInicio(), aluguelModel.getDataFim());
         double valorTotal = dias * aluguelModel.getVeiculo().getValorDiaria();
         aluguelModel.setValorTotal(valorTotal);
@@ -64,6 +70,11 @@ public class AluguelService {
         }
         AluguelModel aluguelAtualizado = aluguelMapper.toModel(aluguelDTO);
         aluguelAtualizado.setId(id);
+
+        if (aluguelAtualizado.getDataFim().isBefore(aluguelAtualizado.getDataInicio())) {
+            throw new PeriodoInvalidoException();
+        }
+
         long dias = ChronoUnit.DAYS.between(aluguelAtualizado.getDataInicio(), aluguelAtualizado.getDataFim());
         double valorTotal = dias * aluguelAtualizado.getVeiculo().getValorDiaria();
         aluguelAtualizado.setValorTotal(valorTotal);

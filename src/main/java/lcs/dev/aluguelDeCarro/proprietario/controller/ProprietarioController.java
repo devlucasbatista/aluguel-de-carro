@@ -3,6 +3,7 @@ package lcs.dev.aluguelDeCarro.proprietario.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lcs.dev.aluguelDeCarro.proprietario.dto.ProprietarioDTO;
 import lcs.dev.aluguelDeCarro.proprietario.service.ProprietarioService;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,7 @@ public class ProprietarioController {
             @ApiResponse(responseCode = "400", description = "Proprietario não foi salvo")
     })
 
-    public ResponseEntity<ProprietarioDTO> salvarProprietario(@RequestBody ProprietarioDTO proprietarioDTO){
+    public ResponseEntity<ProprietarioDTO> salvarProprietario(@Valid @RequestBody ProprietarioDTO proprietarioDTO){
         ProprietarioDTO proprietarioDto = proprietarioService.salvarProprietario(proprietarioDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(proprietarioDto);
@@ -82,7 +83,7 @@ public class ProprietarioController {
             @ApiResponse(responseCode = "404", description = "Proprietario não encontrado, não foi possivel alterar")
     })
 
-    public ResponseEntity<?> atualizarProprietarioPorId(@PathVariable Long id, @RequestBody ProprietarioDTO proprietarioDTO){
+    public ResponseEntity<?> atualizarProprietarioPorId(@PathVariable Long id, @Valid @RequestBody ProprietarioDTO proprietarioDTO){
         ProprietarioDTO atualizarProprietarioPorId = proprietarioService.atualizarProprietarioPorId(id,proprietarioDTO);
         if (atualizarProprietarioPorId != null) {
             return ResponseEntity.ok(atualizarProprietarioPorId);

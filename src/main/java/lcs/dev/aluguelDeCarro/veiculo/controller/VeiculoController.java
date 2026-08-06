@@ -3,6 +3,7 @@ package lcs.dev.aluguelDeCarro.veiculo.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lcs.dev.aluguelDeCarro.veiculo.dto.VeiculoDTO;
 
 import lcs.dev.aluguelDeCarro.veiculo.service.VeiculoService;
@@ -34,7 +35,7 @@ public class VeiculoController {
             @ApiResponse(responseCode = "400", description = "Veiculo não foi salvo")
     })
 
-    public ResponseEntity<?> salvarVeiculo(@RequestBody VeiculoDTO veiculoDTO) {
+    public ResponseEntity<?> salvarVeiculo(@Valid @RequestBody VeiculoDTO veiculoDTO) {
         VeiculoDTO veiculoSalvo = veiculoService.salvarVeiculo(veiculoDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(veiculoSalvo);
@@ -83,7 +84,7 @@ public class VeiculoController {
             @ApiResponse(responseCode = "404", description = "Veiculo não foi atualizado")
     })
 
-    public ResponseEntity<?> atualizarVeiculoPorId(@RequestBody VeiculoDTO veiculoDTO, @PathVariable Long id) {
+    public ResponseEntity<?> atualizarVeiculoPorId(@Valid @RequestBody VeiculoDTO veiculoDTO, @PathVariable Long id) {
         VeiculoDTO atualizarVeiculoPorId = veiculoService.atualizarVeiculoPorId(id, veiculoDTO);
         if (atualizarVeiculoPorId != null) {
             return ResponseEntity.ok(atualizarVeiculoPorId);
