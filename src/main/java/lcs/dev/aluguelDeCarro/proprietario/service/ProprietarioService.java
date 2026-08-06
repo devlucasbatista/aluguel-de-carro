@@ -1,5 +1,6 @@
 package lcs.dev.aluguelDeCarro.proprietario.service;
 
+import lcs.dev.aluguelDeCarro.exceptions.ProprietarioNotFoundException;
 import lcs.dev.aluguelDeCarro.proprietario.dto.ProprietarioDTO;
 import lcs.dev.aluguelDeCarro.proprietario.mapper.ProprietarioMapper;
 import lcs.dev.aluguelDeCarro.proprietario.model.ProprietarioModel;
@@ -7,7 +8,6 @@ import lcs.dev.aluguelDeCarro.proprietario.repository.ProprietarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 // Camada de serviço: concentra a regra de negócio de Proprietario entre o controller e o repositório
@@ -43,16 +43,19 @@ public class ProprietarioService {
     }
 
     // ACHAR PROPRIETARIO PELO SEU ID
-    // Retorna null (tratado no controller) se não encontrar
+    // Lança ProprietarioNotFoundException se o id não existir
+
     public ProprietarioDTO buscarProprietarioPorId(Long id) {
-        return proprietarioMapper.toDTO(proprietarioRepository.findById(id).orElse(null));
+        ProprietarioModel proprietarioModel = proprietarioRepository.findById(id)
+                .orElseThrow(() -> new ProprietarioNotFoundException(id));
+        return proprietarioMapper.toDTO(proprietarioModel);
     }
     // ATUALIZAR PROPRIETARIO PELO ID
     // Busca a entidade existente, sobrescreve os campos com os dados do DTO e salva novamente
     public ProprietarioDTO atualizarProprietarioPorId(Long id, ProprietarioDTO proprietarioDTO) {
-        Optional<ProprietarioModel> proprietarioExiste = proprietarioRepository.findById(id);
-        if (proprietarioExiste.isPresent()) {
-            ProprietarioModel proprietario = proprietarioExiste.get();
+            ProprietarioModel proprietario = proprietarioRepository.findById(id)
+            .orElseThrow(() -> new ProprietarioNotFoundException(id));
+
             proprietario.setNome(proprietarioDTO.getNome());
             proprietario.setEmail(proprietarioDTO.getEmail());
             proprietario.setTelefone(proprietarioDTO.getTelefone());
@@ -63,10 +66,12 @@ public class ProprietarioService {
             proprietarioRepository.save(proprietario);
             return proprietarioMapper.toDTO(proprietario);
         }
-        return null; // id não encontrado
-    }
+
     // DELETAR PROPRIETARIO PELO ID
     public void deletarProprietarioPorId(Long id) {
+        if(!proprietarioRepository.existsById(id)){
+            throw new ProprietarioNotFoundException(id);
+        }
         proprietarioRepository.deleteById(id);
     }
 
