@@ -4,10 +4,10 @@ import lcs.dev.aluguelDeCarro.cliente.dto.ClienteDTO;
 import lcs.dev.aluguelDeCarro.cliente.mapper.ClienteMapper;
 import lcs.dev.aluguelDeCarro.cliente.model.ClienteModel;
 import lcs.dev.aluguelDeCarro.cliente.repository.ClienteRepository;
+import lcs.dev.aluguelDeCarro.exceptions.ClienteNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 // Camada de serviço: concentra a regra de negócio de Cliente entre o controller e o repositório
@@ -40,17 +40,19 @@ public class ClienteService {
                 .collect(Collectors.toList());
     }
     // LISTAR CLIENTE PELO ID
-    // Retorna null (tratado no controller) se não encontrar
+    // Lança ClienteNotFoundException se o id não existir
+
     public ClienteDTO listarClientePorId(Long id) {
-        return clienteMapper.toDTO(clienteRepository.findById(id).orElse(null));
+        ClienteModel clienteModel = clienteRepository.findById(id)
+                .orElseThrow(() -> new ClienteNotFoundException(id));
+                return clienteMapper.toDTO(clienteModel);
     }
 
     // ATUALIZAR CLIENTE PELO ID
     // Busca a entidade existente, sobrescreve os campos com os dados do DTO e salva novamente
     public ClienteDTO atualizarClientePorId(ClienteDTO dto, Long id) {
-        Optional<ClienteModel> clienteExiste = clienteRepository.findById(id);
-        if (clienteExiste.isPresent()) {
-            ClienteModel cliente = clienteExiste.get();
+            ClienteModel cliente = clienteRepository.findById(id)
+                    .orElseThrow(() -> new ClienteNotFoundException(id));
             cliente.setNome(dto.getNome());
             cliente.setCpf(dto.getCpf());
             cliente.setEmail(dto.getEmail());
@@ -61,12 +63,14 @@ public class ClienteService {
             cliente.setIdade(dto.getIdade());
             clienteRepository.save(cliente);
             return clienteMapper.toDTO(cliente);
-        }
-        return null; // id não encontrado
+
     }
 
     // DELETAR CLIENTE PELO ID
     public void excluirClientePorId(Long id) {
+        if(!clienteRepository.existsById(id)){
+            throw new ClienteNotFoundException(id);
+        }
         clienteRepository.deleteById(id);
     }
 }
