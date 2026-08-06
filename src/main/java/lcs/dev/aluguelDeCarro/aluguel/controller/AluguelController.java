@@ -95,6 +95,21 @@ public class AluguelController {
         }
     }
 
+    // FINALIZAR ALUGUEL
+    @PutMapping("/{id}/finalizar")
+
+    @Operation(summary = "Finaliza um aluguel pelo seu id",
+            description = "Rota finaliza o aluguel, mudando o status para FINALIZADO e liberando o veículo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Aluguel finalizado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Aluguel não encontrado")
+    })
+
+    public ResponseEntity<AluguelDTO> finalizarAluguel(@PathVariable Long id) {
+        AluguelDTO aluguelFinalizado = aluguelService.finalizarAluguel(id);
+        return ResponseEntity.ok(aluguelFinalizado);
+    }
+
     // DELETAR ALUGUEL
     @DeleteMapping("/{id}")
 
