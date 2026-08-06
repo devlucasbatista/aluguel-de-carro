@@ -1,16 +1,17 @@
 package lcs.dev.aluguelDeCarro.infra;
 
-import lcs.dev.aluguelDeCarro.exceptions.AluguelNotFoundException;
-import lcs.dev.aluguelDeCarro.exceptions.ClienteNotFoundException;
-import lcs.dev.aluguelDeCarro.exceptions.ProprietarioNotFoundException;
-import lcs.dev.aluguelDeCarro.exceptions.VeiculoNotFoundException;
+import lcs.dev.aluguelDeCarro.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 // Classe global de tratamento de exceptions: intercepta os erros lançados pelos services
-// de todas as entidades e devolve uma resposta HTTP padronizada (404) em vez do erro genérico do Spring
+// de todas as entidades e devolve respostas HTTP padronizadas (404 para não encontrado, 400 para dados inválidos)
 @ControllerAdvice
 public class RestExceptionHandler {
 
@@ -36,5 +37,20 @@ public class RestExceptionHandler {
     @ExceptionHandler(VeiculoNotFoundException.class)
     public ResponseEntity<String> veiculoNotFound(VeiculoNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    // Captura erros de validação (@Valid) e retorna 400 com um mapa de campo -> mensagem de erro
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
+        Map<String, String> erros = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(erro ->
+                erros.put(erro.getField(), erro.getDefaultMessage())
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erros);
+    }
+
+    @ExceptionHandler(PeriodoInvalidoException.class)
+    public ResponseEntity<String> handlePeriodoInvalido(PeriodoInvalidoException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }

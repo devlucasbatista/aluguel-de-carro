@@ -1,5 +1,6 @@
 package lcs.dev.aluguelDeCarro.cliente.dto;
 
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,12 +12,30 @@ import lombok.NoArgsConstructor;
 public class ClienteDTO {
 
     private Long id;
+
+    @NotBlank(message = "Nome é obrigatório")
     private String nome;
+
+    @NotBlank(message = "CPF é obrigatório")
+    @Pattern(regexp = "\\d{11}", message = "CPF deve conter 11 dígitos numéricos")
     private String cpf;
+
+    @NotBlank(message = "Email é obrigatório")
+    @Email(message = "Email inválido")
     private String email;
+
+    @NotBlank(message = "Endereço é obrigatório")
     private String endereco;
+
+    @NotBlank(message = "Telefone é obrigatório")
     private String telefone;
+
+    @NotBlank(message = "Sexo é obrigatório")
     private String sexo;
+
+    @NotBlank(message = "CNH é obrigatória")
     private String cnh;
+
+    @Min(value = 18, message = "Cliente deve ser maior de idade")
     private int idade;
 }

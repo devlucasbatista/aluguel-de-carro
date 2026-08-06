@@ -3,6 +3,7 @@ package lcs.dev.aluguelDeCarro.aluguel.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lcs.dev.aluguelDeCarro.aluguel.dto.AluguelDTO;
 import lcs.dev.aluguelDeCarro.aluguel.service.AluguelService;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class AluguelController {
             @ApiResponse(responseCode = "400", description = "Aluguel não foi salvo")
     })
 
-    public ResponseEntity<AluguelDTO> salvarAluguel(@RequestBody AluguelDTO aluguelDTO) {
+    public ResponseEntity<AluguelDTO> salvarAluguel(@Valid @RequestBody AluguelDTO aluguelDTO) {
         AluguelDTO saveAluguel = aluguelService.salvarAluguel(aluguelDTO);
         return  ResponseEntity.status(HttpStatus.CREATED)
                 .body(saveAluguel);
@@ -84,7 +85,7 @@ public class AluguelController {
             @ApiResponse(responseCode = "404", description = "Aluguel não encontrado")
     })
 
-    public ResponseEntity<?> atualizarAluguelPorId(@PathVariable long id, @RequestBody AluguelDTO aluguelDTO) {
+    public ResponseEntity<?> atualizarAluguelPorId(@PathVariable long id, @Valid @RequestBody AluguelDTO aluguelDTO) {
         AluguelDTO atualizarAluguel = aluguelService.atualizarAluguelPorId(id, aluguelDTO);
         if (atualizarAluguel != null) {
             return ResponseEntity.ok(atualizarAluguel);

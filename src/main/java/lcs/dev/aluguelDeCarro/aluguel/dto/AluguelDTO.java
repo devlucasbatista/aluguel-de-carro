@@ -1,5 +1,7 @@
 package lcs.dev.aluguelDeCarro.aluguel.dto;
 
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
 import lcs.dev.aluguelDeCarro.aluguel.enums.AluguelStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,10 +16,21 @@ import java.time.LocalDate;
 public class AluguelDTO {
 
     private Long id;
+
+    @NotNull(message = "Data de início é obrigatória")
+    @FutureOrPresent(message = "Data de início não pode ser no passado")
     private LocalDate dataInicio;
+
+    @NotNull(message = "Data de fim é obrigatória")
     private LocalDate dataFim;
-    private Double valorTotal;
+
+    private Double valorTotal; // calculado pelo Service, não precisa validar aqui
+
     private AluguelStatus status;
-    private Long clienteId; // id do cliente relacionado (evita expor a entidade inteira)
-    private Long veiculoId; // id do veículo relacionado (evita expor a entidade inteira)
+
+    @NotNull(message = "Id do cliente é obrigatório")
+    private Long clienteId;
+
+    @NotNull(message = "Id do veículo é obrigatório")
+    private Long veiculoId;
 }
