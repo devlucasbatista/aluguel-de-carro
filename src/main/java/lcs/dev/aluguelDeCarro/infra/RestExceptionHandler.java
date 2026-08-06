@@ -48,9 +48,15 @@ public class RestExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erros);
     }
-
+    // Captura PeriodoInvalido e retorna 400 com a mensagem do erro
     @ExceptionHandler(PeriodoInvalidoException.class)
     public ResponseEntity<String> handlePeriodoInvalido(PeriodoInvalidoException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    // Captura VeiculoIndisponivel e retorna 400 com a mensagem do erro
+    @ExceptionHandler(VeiculoIndisponivelException.class)
+    public ResponseEntity<String> handleVeiculoIndisponivel(VeiculoIndisponivelException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }

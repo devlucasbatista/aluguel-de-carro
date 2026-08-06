@@ -1,11 +1,14 @@
 package lcs.dev.aluguelDeCarro.aluguel.service;
 
 import lcs.dev.aluguelDeCarro.aluguel.dto.AluguelDTO;
+import lcs.dev.aluguelDeCarro.aluguel.enums.AluguelStatus;
 import lcs.dev.aluguelDeCarro.aluguel.mapper.AluguelMapper;
 import lcs.dev.aluguelDeCarro.aluguel.model.AluguelModel;
 import lcs.dev.aluguelDeCarro.aluguel.repository.AluguelRepository;
 import lcs.dev.aluguelDeCarro.exceptions.AluguelNotFoundException;
 import lcs.dev.aluguelDeCarro.exceptions.PeriodoInvalidoException;
+import lcs.dev.aluguelDeCarro.exceptions.VeiculoIndisponivelException;
+import lcs.dev.aluguelDeCarro.veiculo.repository.VeiculoRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
@@ -19,14 +22,16 @@ public class AluguelService {
     // INJEÇÃO DE DEPENDENCIA
     private final AluguelRepository aluguelRepository;
     private final AluguelMapper aluguelMapper;
-
+    private final VeiculoRepository veiculoRepository;
 
     // Injeção de dependência via construtor
-    public AluguelService(AluguelRepository aluguelRepository, AluguelMapper aluguelMapper) {
+
+
+    public AluguelService(AluguelRepository aluguelRepository, AluguelMapper aluguelMapper, VeiculoRepository veiculoRepository) {
         this.aluguelRepository = aluguelRepository;
         this.aluguelMapper = aluguelMapper;
+        this.veiculoRepository = veiculoRepository;
     }
-
 
     // SALVAR ALUGUEL
     // Converte o DTO em entidade, calcula o valor total pela quantidade de dias x diária do veículo e persiste
@@ -37,9 +42,18 @@ public class AluguelService {
             throw new PeriodoInvalidoException();
         }
 
+        if (!aluguelModel.getVeiculo().isDisponivel()) {
+            throw new VeiculoIndisponivelException(aluguelModel.getVeiculo().getId());
+        }
+
         long dias = ChronoUnit.DAYS.between(aluguelModel.getDataInicio(), aluguelModel.getDataFim());
         double valorTotal = dias * aluguelModel.getVeiculo().getValorDiaria();
         aluguelModel.setValorTotal(valorTotal);
+        aluguelModel.setStatus(AluguelStatus.ATIVO);
+
+        aluguelModel.getVeiculo().setDisponivel(false);
+        veiculoRepository.save(aluguelModel.getVeiculo());
+
         return aluguelMapper.toDTO(aluguelRepository.save(aluguelModel));
     }
 
@@ -87,5 +101,17 @@ public class AluguelService {
             throw new AluguelNotFoundException(id);
         }
         aluguelRepository.deleteById(id);
+    }
+
+    // FINALIZAR ALUGUEL
+    public AluguelDTO finalizarAluguel(Long id) {
+        AluguelModel aluguel = aluguelRepository.findById(id)
+                .orElseThrow(() -> new AluguelNotFoundException(id)); // 1º: verifica se existe
+
+        aluguel.setStatus(AluguelStatus.FINALIZADO); // 2º: só chega aqui se existir
+        aluguel.getVeiculo().setDisponivel(true);
+        veiculoRepository.save(aluguel.getVeiculo());
+
+        return aluguelMapper.toDTO(aluguelRepository.save(aluguel));
     }
 }
